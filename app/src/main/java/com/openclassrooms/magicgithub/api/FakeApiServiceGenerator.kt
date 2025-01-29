@@ -6,7 +6,7 @@ import java.util.*
 object FakeApiServiceGenerator {
 
     @JvmField
-    var FAKE_USERS = mutableListOf(
+    val FAKE_USERS: List<User> = listOf( // Use `listOf()` instead of `mutableListOf()`
         User("001", "Jake", "https://api.adorable.io/AVATARS/512/1.png"),
         User("002", "Paul", "https://api.adorable.io/AVATARS/512/2.png"),
         User("003", "Phil", "https://api.adorable.io/AVATARS/512/3.png"),

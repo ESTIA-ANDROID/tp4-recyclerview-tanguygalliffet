@@ -1,9 +1,10 @@
 package com.openclassrooms.magicgithub.api
 
+import com.openclassrooms.magicgithub.api.FakeApiServiceGenerator.FAKE_USERS
 import com.openclassrooms.magicgithub.model.User
 
 class FakeApiService : ApiService {
-    private val _users = mutableListOf<User>().apply {
+    private val _users = FAKE_USERS.toMutableList().apply {
         addAll(FakeApiServiceGenerator.FAKE_USERS) // Initialize with predefined users
     }
 
