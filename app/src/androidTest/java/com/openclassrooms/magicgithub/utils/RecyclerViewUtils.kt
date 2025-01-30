@@ -16,6 +16,7 @@ object RecyclerViewUtils {
     fun clickChildView(id: Int): ViewAction {
         return object : ViewAction {
             override fun getConstraints(): Matcher<View> {
+                // Optionally you can match the root layout or anything else
                 return ViewMatchers.withId(R.id.activity_list_user_fab)
             }
 

@@ -1,42 +1,71 @@
 package com.openclassrooms.magicgithub.ui.user_list
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.openclassrooms.magicgithub.R
+import com.bumptech.glide.Glide
+import com.openclassrooms.magicgithub.databinding.ItemListUserBinding
 import com.openclassrooms.magicgithub.model.User
-import com.openclassrooms.magicgithub.utils.UserDiffCallback
 
-class UserListAdapter(  // FOR CALLBACK ---
-    private val callback: Listener
-) : RecyclerView.Adapter<ListUserViewHolder>() {
-    // FOR DATA ---
-    private var users: List<User> = ArrayList()
+class UserAdapter(
+    private var users: MutableList<User>,
+    private val listener: Listener
+) : RecyclerView.Adapter<UserAdapter.UserViewHolder>() {
 
     interface Listener {
         fun onClickDelete(user: User)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListUserViewHolder {
-        val context = parent.context
-        val inflater = LayoutInflater.from(context)
-        val view = inflater.inflate(R.layout.item_list_user, parent, false)
-        return ListUserViewHolder(view)
+    class UserViewHolder(val binding: ItemListUserBinding) : RecyclerView.ViewHolder(binding.root)
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
+        val binding = ItemListUserBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
+        )
+        return UserViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: ListUserViewHolder, position: Int) {
-        holder.bind(users[position], callback)
+    override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
+        val user = users[position]
+
+        // Set user name
+        holder.binding.itemListUserUsername.text = user.login
+
+        // Load avatar with Glide
+        Glide.with(holder.itemView.context)
+            .load(user.avatarUrl)
+            .into(holder.binding.itemListUserAvatar)
+
+        // Background color depends on isActive
+        holder.binding.root.setBackgroundColor(
+            if (user.isActive) Color.WHITE else Color.RED
+        )
+
+        // Delete
+        holder.binding.itemListUserDeleteButton.setOnClickListener {
+            listener.onClickDelete(user)
+        }
     }
 
-    override fun getItemCount(): Int {
-        return users.size
+    override fun getItemCount() = users.size
+
+    fun updateUsers(newUsers: List<User>) {
+        users.clear()
+        users.addAll(newUsers)
+        notifyDataSetChanged()
     }
 
-    // PUBLIC API ---
-    fun updateList(newList: List<User>) {
-        val diffResult = DiffUtil.calculateDiff(UserDiffCallback(newList, users))
-        users = newList
-        diffResult.dispatchUpdatesTo(this)
+    fun moveUser(fromPosition: Int, toPosition: Int) {
+        if (fromPosition < 0 || toPosition < 0 || fromPosition >= users.size || toPosition >= users.size) return
+        val movedUser = users.removeAt(fromPosition)
+        users.add(toPosition, movedUser)
+        notifyItemMoved(fromPosition, toPosition)
+    }
+
+    fun getUserAt(position: Int): User {
+        return users[position]
     }
 }
